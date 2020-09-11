@@ -107,12 +107,12 @@ def unifies(scores, species):
     return species
 
 
-def summation(scores):
-    """Sum of the scores."""
-    total = 0
-    for i in scores:
-        total += i
-    return total
+# def summation(scores):
+#     """Sum of the scores."""
+#     total = 0
+#     for i in scores:
+#         total += i
+#     return total
 
 
 def cum_sum(pro):
@@ -133,14 +133,14 @@ def cum_sum(pro):
 
 def select(scores, species):
     """Select individuals with high adaptability. """
-    total = summation(scores)
+    total = sum(scores)
     probabilities = []
     for i in range(len(scores)):
         probabilities.append(scores[i] / total)
     intervals = cum_sum(probabilities)
     new_species = []
-    con = 0
-    while con < len(species):
+    index = 0
+    while index < len(species):
         rand = random.random()
         for i, v in enumerate(intervals):
             if intervals[i - 1] <= rand < v:
@@ -148,7 +148,7 @@ def select(scores, species):
                     new_species = numpy.array([species[i - 1]])
                 else:
                     new_species = numpy.append(new_species, [species[i - 1]], axis=0)
-        con += 1
+        index += 1
     return new_species
 
 
