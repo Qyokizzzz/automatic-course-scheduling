@@ -37,7 +37,7 @@ def translate(chromosome, catalog):
     """Visualizing gene coding."""
     time_table = [[] for i in range(0,len(chromosome))]
     tmp = []
-    for i,v in enumerate(chromosome):
+    for i, v in enumerate(chromosome):
         for j in v:
             tmp.append(catalog.get(j))
         time_table[i] = copy.deepcopy(tmp)
@@ -79,7 +79,7 @@ def fitness(chromosome, lesson_quantity):
 
     score = 0
     for i, v in enumerate(chromosome):
-        for j in range(0,lesson_quantity):
+        for j in range(0, lesson_quantity):
             if numpy.sum(v == j) <= 1:
                 score += 80
             elif numpy.sum(v == j)>1 and numpy.sum(v == j)<=3:
@@ -148,7 +148,7 @@ def select(scores, species):
                 if len(new_species) == 0:
                     new_species = numpy.array([species[i - 1]])
                 else:
-                    new_species = numpy.append(new_species,[species[i - 1]], axis=0)
+                    new_species = numpy.append(new_species, [species[i - 1]], axis=0)
         con += 1
     return new_species
 
@@ -214,16 +214,16 @@ def crossover(species, scores, n):
     return new_species
 
 
-def vary(species, lesson_quantity, iter=40, p=0.1,):
+def vary(species, lesson_quantity, iters=40, p=0.1,):
     """
     Produce variation.
     :param species: Ignore.
     :param lesson_quantity: Ignore.
-    :param iter: Number of iterations.
+    :param iters: Number of iterations.
     :param p: Probability threshold of variation.
     """
     c = 0
-    while c < iter:
+    while c < iters:
         rand = random.random()
         if rand <= p:
             rand1 = random.randrange(0, len(species))
