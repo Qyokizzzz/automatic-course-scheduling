@@ -12,8 +12,7 @@ def lesson_initialization(lesson_quantity):
     lessons = []
     lesson_num = []
     for i in range(lesson_quantity):
-        tmp = input('Please input lesson:')
-        lessons.append(tmp)
+        lessons.append(input('Please input lesson:'))
         while 1:
             tmp = random.randrange(lesson_quantity)
             if tmp not in lesson_num:
@@ -25,17 +24,17 @@ def lesson_initialization(lesson_quantity):
     return catalog
 
 
-def lesson_initialization2(lesson_quantity, *args):
-    """Input lessons and distribute a number for every lesson."""
-    lessons = list(args)[0]
-    lesson_num = [ i for i in range(0,lesson_quantity)]
-    catalog = dict(zip(lesson_num, lessons))
-    return catalog
+# def lesson_initialization2(lesson_quantity, *args):
+#     """Input lessons and distribute a number for every lesson."""
+#     lessons = list(args)[0]
+#     lesson_num = [i for i in range(0, lesson_quantity)]
+#     catalog = dict(zip(lesson_num, lessons))
+#     return catalog
 
 
 def translate(chromosome, catalog):
     """Visualizing gene coding."""
-    time_table = [[] for i in range(0,len(chromosome))]
+    time_table = [[] for i in range(0, len(chromosome))]
     tmp = []
     for i, v in enumerate(chromosome):
         for j in v:
@@ -53,7 +52,7 @@ def init_chromosome(workdays, times, catalog):
     :param catalog: Ignore.
     """
     num = len(catalog)
-    chromosome = [0 for i in range(workdays)]
+    chromosome = [[] for i in range(workdays)]
     gene = [0 for i in range(times)]
     for i in range(workdays):
         for j in range(times):
@@ -67,7 +66,7 @@ def species_origin(comm_num, *args):
     Initialize a original species.
     :param comm_num: Define the number of species.
     """
-    species = [0 for i in range(comm_num)]
+    species = [[] for i in range(comm_num)]
     for i in range(comm_num):
         species[i] = init_chromosome(*args)
     species = numpy.array(species)
@@ -76,23 +75,23 @@ def species_origin(comm_num, *args):
 
 def fitness(chromosome, lesson_quantity):
     """Evaluation adaptability."""
-
     score = 0
     for i, v in enumerate(chromosome):
         for j in range(0, lesson_quantity):
-            if numpy.sum(v == j) <= 1:
+            repeat_nums = numpy.sum(v == j)
+            if repeat_nums <= 1:
                 score += 80
-            elif numpy.sum(v == j)>1 and numpy.sum(v == j)<=3:
+            elif 1 < repeat_nums <= 3:
                 score -= 60
-            elif numpy.sum(v == j)>2 and numpy.sum(v == j)<=4:
+            elif 3 < repeat_nums <= 4:
                 score -= 80
-            elif numpy.sum(v == j)>3 and numpy.sum(v == j)<=5:
+            elif 4 < repeat_nums <= 5:
                 score -= 100
             else:
                 score -= 800
         if i < len(chromosome) - 1:
             for k in v:
-                if k not in chromosome[i+1]:
+                if k not in chromosome[i + 1]:
                     score += 4
                 else:
                     score -= 4
@@ -144,7 +143,7 @@ def select(scores, species):
     while con < len(species):
         rand = random.random()
         for i, v in enumerate(intervals):
-            if rand < v and rand >= intervals[i - 1]:
+            if intervals[i - 1] <= rand < v:
                 if len(new_species) == 0:
                     new_species = numpy.array([species[i - 1]])
                 else:
@@ -285,7 +284,7 @@ if __name__ == '__main__':
     try:
         run(6, 5, 6, 50, 1800)  # 2220
     except (IndexError, ValueError):
-        print('The species have already been died out.')
+        print('The species have already died out.')
     # dic = ['数学','物理','英语','化学','语文','生物']
     # info = lesson_initialization2(6, dic)
     # lessons = lesson_initialization(6)
