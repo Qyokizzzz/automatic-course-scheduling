@@ -3,7 +3,7 @@ __author__ = 'Ldaze'
 # This project will be optimized in the future.
 
 import random
-import numpy
+import numpy as np
 import copy
 
 
@@ -69,7 +69,7 @@ def species_origin(comm_num, *args):
     species = [[] for i in range(comm_num)]
     for i in range(comm_num):
         species[i] = init_chromosome(*args)
-    species = numpy.array(species)
+    species = np.array(species)
     return species
 
 
@@ -78,7 +78,7 @@ def fitness(chromosome, lesson_quantity):
     score = 0
     for i, v in enumerate(chromosome):
         for j in range(0, lesson_quantity):
-            repeat_nums = numpy.sum(v == j)
+            repeat_nums = np.sum(v == j)
             if repeat_nums <= 1:
                 score += 80
             elif 1 < repeat_nums <= 3:
@@ -103,7 +103,7 @@ def unifies(scores, species):
     for i, v in enumerate(scores):
         if v < 0:
             del scores[i]
-            species = numpy.delete(species, i, axis=0)
+            species = np.delete(species, i, axis=0)
     return species
 
 
@@ -145,9 +145,9 @@ def select(scores, species):
         for i, v in enumerate(intervals):
             if intervals[i - 1] <= rand < v:
                 if len(new_species) == 0:
-                    new_species = numpy.array([species[i - 1]])
+                    new_species = np.array([species[i - 1]])
                 else:
-                    new_species = numpy.append(new_species, [species[i - 1]], axis=0)
+                    new_species = np.append(new_species, [species[i - 1]], axis=0)
         index += 1
     return new_species
 
@@ -157,42 +157,39 @@ def arb_hybridization(species):
     tmp1 = random.choice(species)
     tmp2 = random.choice(species)
     rand = random.randrange(0, len(species[0]))
-    child1 = numpy.vstack((tmp1[0:rand], tmp2[rand:len(species[0])]))
-    # child2 = numpy.vstack((tmp1[rand:len(species[0])], tmp2[0:rand]))
-    # new_species = numpy.vstack(([child1],[child2]))
-    # return new_species
-    return child1
+    child1 = np.vstack((tmp1[0:rand], tmp2[rand:len(species[0])]))
+    child2 = np.vstack((tmp2[0:rand], tmp1[rand:len(species[0])]))
+    child = [child1, child2]
+    return [child[random.randint(0, 1)]]
 
 
 def delete(species, index):
     """Delete the chromosome in species."""
     if index == 0:
-        return numpy.array(species[1:len(species)])
+        return np.array(species[1:len(species)])
     else:
-        tmp1 = numpy.array(species[0:index])
-        tmp2 = numpy.array(species[index + 1:len(species)])
-    return numpy.append(tmp1, tmp2, axis=0)
+        tmp1 = np.array(species[0:index])
+        tmp2 = np.array(species[index + 1:len(species)])
+    return np.append(tmp1, tmp2, axis=0)
 
 
 def select_best_index(scores):
     """Select index of the best individual in the species."""
-    max_score = max(scores)
-    best_index = scores.index(max_score)
-    return best_index
+    return scores.index(max(scores))
 
 
 def select_best_species(species, scores, n):
     """Select excellent individuals."""
     tmp_scores = scores.copy()
-    tmp_species = numpy.array(species)
+    tmp_species = np.array(species)
     index = select_best_index(tmp_scores)
-    excellent_species = numpy.array([tmp_species[index]])
+    excellent_species = np.array([tmp_species[index]])
     tmp_species = delete(tmp_species, index)
     del tmp_scores[index]
     for i in range(0, n-1):
         index = select_best_index(tmp_scores)
-        tmp = numpy.array([tmp_species[index]])
-        excellent_species = numpy.append(excellent_species, tmp, axis=0)
+        tmp = np.array([tmp_species[index]])
+        excellent_species = np.append(excellent_species, tmp, axis=0)
         tmp_species = delete(tmp_species, index)
         del tmp_scores[index]
     return excellent_species
@@ -206,14 +203,14 @@ def crossover(species, scores, n):
     :param n: Retain several excellent chromosomes.
     """
     num = len(species)
-    new_species = numpy.array(select_best_species(species,scores,n))# Retain several excellent chromosomes
-    # new_species = numpy.array(select_best(species,scores))
+    new_species = np.array(select_best_species(species, scores, n))  # Retain several excellent chromosomes
+    # new_species = np.array(select_best(species,scores))
     for i in range(0, num-n):
-        new_species = numpy.append(new_species, [arb_hybridization(species)], axis=0)
+        new_species = np.append(new_species, arb_hybridization(species), axis=0)
     return new_species
 
 
-def vary(species, lesson_quantity, iters=40, p=0.1,):
+def vary(species, lesson_quantity, iters=40, p=0.1):
     """
     Produce variation.
     :param species: Ignore.
@@ -225,10 +222,10 @@ def vary(species, lesson_quantity, iters=40, p=0.1,):
     while c < iters:
         rand = random.random()
         if rand <= p:
-            rand1 = random.randrange(0, len(species))
-            rand2 = random.randrange(0, len(species[0]))
-            rand3 = random.randrange(0, len(species[0][0]))
-            species[rand1][rand2][rand3] = random.randrange(0, lesson_quantity)
+            chromosome = random.randrange(0, len(species))
+            gene = random.randrange(0, len(species[0]))
+            base = random.randrange(0, len(species[0][0]))
+            species[chromosome][gene][base] = random.randrange(0, lesson_quantity)
         c += 1
 
 
@@ -248,7 +245,7 @@ def iteration(lesson_quantity, species, threshold, n=1):
             scores.append(fitness(i, lesson_quantity))
         species = unifies(scores, species)
         species = select(scores, species)
-        species = crossover(species,scores,n)
+        species = crossover(species, scores, n)
         vary(species, lesson_quantity)
         for i in species:
             score.append(fitness(i, lesson_quantity))
