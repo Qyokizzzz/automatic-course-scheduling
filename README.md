@@ -1,4 +1,4 @@
-# automatic-course-scheduling-function
+# automatic-course-scheduling
 Automatic course scheduling function based on genetic algorithm
 
 Environment: 
